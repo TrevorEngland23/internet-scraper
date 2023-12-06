@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,8 +18,10 @@ public class Scraper extends JFrame{
     JTextField urlToGet;
     DefaultTableModel tableModel;
     JTable table;
-    JComboBox regexComboBox;
+    JComboBox<String> regexComboBox;
     JButton button;
+     HashSet<String> matches = new HashSet<String>();
+     JButton resetButton;
 
 
     //ctor(s)
@@ -48,7 +52,7 @@ public class Scraper extends JFrame{
         JPanel southJPanel = new JPanel(); // basically a "div", creates a section basically
 
         // regexTextField = new JTextField("Enter REGEX", 20); // instanciate a new text field... 20 is to make the bar on the bottom larger
-        regexComboBox = new JComboBox();
+        regexComboBox = new JComboBox<String>();
         regexComboBox.addItem("\\d{3}\\-\\d{3}\\-\\d{4}");
         regexComboBox.addItem("[0-9]");
         regexComboBox.addItem("[A-Za-z0-9\\.]+\\@[A-Za-z0-9]+\\.[A-Za-z0-9]+"); // reference regex slides
@@ -56,8 +60,11 @@ public class Scraper extends JFrame{
         southJPanel.add(regexComboBox); // add it to the new section we just created.
 
         button = new JButton("Submit");
+        resetButton = new JButton("Reset");
+        resetButton.addActionListener(e -> reset(e));
         button.addActionListener(e -> searchPage(e)); // lambda for action event
         southJPanel.add(button);
+        southJPanel.add(resetButton);
 
         add(southJPanel, BorderLayout.SOUTH); // append that to the bottom of the screen
 
@@ -68,9 +75,14 @@ public class Scraper extends JFrame{
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
+    public void reset(ActionEvent e){
+        tableModel.setRowCount(0);
+    }
+
     // methods
 
     public void searchPage(ActionEvent e){
+        tableModel.setRowCount(0); // resets the data upon each click
         try{
         URL url = new URL(urlToGet.getText()); // url passed in
 
@@ -78,7 +90,7 @@ public class Scraper extends JFrame{
         InputStream inputStream = urlConnection.getInputStream();
 
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-        
+       
         String line = null;
 
         while((line = bufferedReader.readLine()) != null){ // while we have lines to read...
@@ -89,6 +101,12 @@ public class Scraper extends JFrame{
             // add to our table 
 
             if(matcher.find()){ // if there is a line to read
+                
+                if(matches.contains(matcher.group())){
+                    // do nothing
+                }
+                var grouping = matcher.group();
+                matches.add(grouping);
                 tableModel.addRow(new Object[]{String.valueOf(tableModel.getRowCount() + 1), matcher.group()}); // add a row to our table model, holding a key value pair of row count and a potential match based on the regex the user types in.
             }
         }
