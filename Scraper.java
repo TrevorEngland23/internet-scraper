@@ -23,7 +23,8 @@ public class Scraper extends JFrame{
         String data[][] = {{"1", "Trevor Engand", "Unemployed"}, {"2", "Amber England", "85000"}, {"3", "Bob Marley", "100000"}};
 
         table = new JTable(data, columns); // intializes table
-        add(table); // adds to JFrame
+        JScrollPane scrollPane = new JScrollPane(table);
+        add(scrollPane);
 
         // set JFrame visibility / viewing configs...
         setVisible(true);
