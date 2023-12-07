@@ -1,17 +1,13 @@
 import javax.swing.*;
 import javax.swing.table.*;
-
+import java.util.regex.*;
 import java.awt.*; // imports BorderLayout
 import java.awt.event.*;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 public class Scraper extends JFrame{
     // variables
@@ -20,8 +16,8 @@ public class Scraper extends JFrame{
     JTable table;
     JComboBox<String> regexComboBox;
     JButton button;
-     HashSet<String> matches = new HashSet<String>();
-     JButton resetButton;
+    HashSet<String> matches = new HashSet<String>();
+    JButton resetButton;
 
 
     //ctor(s)
@@ -56,6 +52,9 @@ public class Scraper extends JFrame{
         regexComboBox.addItem("\\d{3}\\-\\d{3}\\-\\d{4}");
         regexComboBox.addItem("[0-9]");
         regexComboBox.addItem("[A-Za-z0-9\\.]+\\@[A-Za-z0-9]+\\.[A-Za-z0-9]+"); // reference regex slides
+        regexComboBox.addItem("<[^>]*>"); // regex for HTML elements
+        regexComboBox.addItem("(\\d{1,3}\\.){3}\\d{1,3}"); // regex for ipv4
+      
 
         southJPanel.add(regexComboBox); // add it to the new section we just created.
 
@@ -75,11 +74,11 @@ public class Scraper extends JFrame{
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
+       // methods
+
     public void reset(ActionEvent e){
         tableModel.setRowCount(0);
     }
-
-    // methods
 
     public void searchPage(ActionEvent e){
         tableModel.setRowCount(0); // resets the data upon each click
